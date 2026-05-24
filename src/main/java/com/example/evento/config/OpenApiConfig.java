@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${app.name:Gestión de Reportes}")
+    @Value("${app.name:Gestión de Eventos}")
     private String appName;
 
     @Value("${app.version:1.0.1}")
@@ -20,6 +20,6 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title(appName)
                         .version(appVersion)
-                        .description("Documentación de los endpoints para el Microservicio Reporte"));
+                        .description("Documentación de los endpoints para el Microservicio Eventos"));
     }
 }

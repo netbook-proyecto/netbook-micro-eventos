@@ -20,4 +20,5 @@ public class ActualizarEventoRequest {
 
     @NotBlank(message = "La visibilidad del evento es obligatoria")
     private String visibilidad;
+
 }

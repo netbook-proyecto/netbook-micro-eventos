@@ -21,7 +21,7 @@ public class EventoCalendario {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int idEventoCalendario;
 
-    @Column(nullable=false, length = 100)
+    @Column(nullable=false)
     private String tituloEvento;
     
     @Column(nullable = false, length = 500)
@@ -31,24 +31,17 @@ public class EventoCalendario {
     @Column(nullable = false, length = 50)
     private String tipoEvento;
     
-    @Column(nullable = false, length = 50)
+    @Column(name = "visibilidad evento",nullable = false, length = 50)
     private String visibilidad;
     
-    @Column(name = "fecha inicio", nullable = false, updatable = false)
-    private LocalDateTime fechaInicio;
-
-    @Column(name = "fecha termino", nullable = false, updatable = false)
-    private LocalDateTime fechaTermino;
+    @Column(name = "fecha Evento", nullable = false, updatable= false)
+    private LocalDateTime fechaEvento;
 
     @PrePersist
-    protected void fechaInicial() {
-        this.fechaInicio = LocalDateTime.now();
+    protected void onCreate() {
+        this.fechaEvento = LocalDateTime.now();
     }
 
-    @PrePersist
-    protected void fechaFinal() {
-        this.fechaTermino = LocalDateTime.now();
-    }
 
 
 }

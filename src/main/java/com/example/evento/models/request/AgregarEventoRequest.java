@@ -17,4 +17,6 @@ public class AgregarEventoRequest {
 
     @NotBlank(message = "La visibilidad del evento es obligatoria")
     private String visibilidad;
+
+    
 }
