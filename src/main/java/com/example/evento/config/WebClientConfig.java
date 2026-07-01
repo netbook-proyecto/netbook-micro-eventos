@@ -6,7 +6,12 @@ import org.springframework.context.annotation.Bean;
 @Configuration
 public class WebClientConfig {
     @Bean
-    public WebClient webClient() {
-        return WebClient.builder().baseUrl("http://localhost:5010/reporte.html").build();
+    public WebClient eventowebClient() {
+        return WebClient.builder().baseUrl("http://localhost:5010/evento.html").build();
+    }
+
+    @Bean
+    public WebClient mensajeriawebClient() {
+        return WebClient.builder().baseUrl("http://localhost:5008/mensajeria.html").build();
     }
 }

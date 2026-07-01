@@ -1,14 +1,13 @@
 package com.example.evento.models.entities;
 
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -26,22 +25,16 @@ public class EventoCalendario {
     
     @Column(nullable = false, length = 500)
     private String descripcionEvento;
-
     
     @Column(nullable = false, length = 50)
     private String tipoEvento;
     
-    @Column(name = "visibilidad evento",nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String visibilidad;
     
-    @Column(name = "fecha Evento", nullable = false, updatable= false)
-    private LocalDateTime fechaEvento;
+    @Column(nullable = false)
+    private LocalDate fechaEvento;
 
-    @PrePersist
-    protected void onCreate() {
-        this.fechaEvento = LocalDateTime.now();
     }
 
 
-
-}

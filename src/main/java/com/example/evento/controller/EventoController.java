@@ -1,5 +1,6 @@
 package com.example.evento.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.evento.models.entities.EventoCalendario;
-import com.example.evento.models.request.AgregarEventoRequest;
 import com.example.evento.models.request.ActualizarEventoRequest;
+import com.example.evento.models.request.AgregarEventoRequest;
 import com.example.evento.service.EventoService;
 
 @RequestMapping("evento")
@@ -35,11 +36,13 @@ public class EventoController {
     }
 
     @PostMapping("")
+    @Valid
     public EventoCalendario crearEvento(@RequestBody AgregarEventoRequest nuevo) {
         return eventoService.agregarEvento(nuevo);
     }
 
     @PutMapping("")
+    @Valid
     public EventoCalendario actualizarEvento(@RequestBody ActualizarEventoRequest nuevo) {
         return eventoService.actualizarEvento(nuevo);
     }

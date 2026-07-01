@@ -1,5 +1,7 @@
 package com.example.evento.models.request;
 
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -20,5 +22,8 @@ public class ActualizarEventoRequest {
 
     @NotBlank(message = "La visibilidad del evento es obligatoria")
     private String visibilidad;
+    
+    @NotBlank(message = "La fecha del evento es obligatoria")
+    private LocalDate fechaEvento;
 
 }
