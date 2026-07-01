@@ -11,7 +11,7 @@ public class WebClientConfig {
     }
 
     @Bean
-    public WebClient mensajeriawebClient() {
-        return WebClient.builder().baseUrl("http://localhost:5008/mensajeria.html").build();
+    public WebClient mensajeriaWebClient() {
+        return WebClient.builder().baseUrl("http://localhost:5008").build();
     }
 }

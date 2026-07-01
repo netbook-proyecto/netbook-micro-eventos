@@ -22,7 +22,6 @@ public class EventoService {
     @Autowired
     private EventoRepository eventoRepository;
 
-    // 1. Inyectamos el cliente web que apunta al puerto de tu compañero
     @Autowired
     @Qualifier("mensajeriaWebClient")
     private WebClient mensajeriaWebClient;
@@ -46,11 +45,9 @@ public class EventoService {
         eventoNuevo.setTipoEvento(nuevo.getTipoEvento());
         eventoNuevo.setVisibilidad(nuevo.getVisibilidad());
         eventoNuevo.setFechaEvento(nuevo.getFechaEvento());
-        
-        // Guardamos el evento en tu base de datos primero
+
         EventoCalendario eventoGuardado = eventoRepository.save(eventoNuevo);
 
-        // 2. Llamamos al método que se comunica con el otro microservicio
         enviarMensajeNotificacion(eventoGuardado);
 
         return eventoGuardado;
@@ -77,30 +74,24 @@ public class EventoService {
         return eventoRepository.save(eventocalendario);
     }
 
-    // --- NUEVO MÉTODO DE COMUNICACIÓN ---
     private void enviarMensajeNotificacion(EventoCalendario evento) {
         try {
-            // Preparamos el DTO con los datos que necesita tu compañero
             MensajeriaDTO mensajeDTO = new MensajeriaDTO();
-            mensajeDTO.setIdMensaje(evento.getIdEventoCalendario()); // Usamos el ID del evento como referencia
-            mensajeDTO.setFechaEnvio(LocalDate.now());
+            mensajeDTO.setFechaEnvio(LocalDate.now().toString());
             mensajeDTO.setAsunto("Nuevo evento creado: " + evento.getTituloEvento());
             mensajeDTO.setCuerpoMensaje("Se ha creado el evento con la siguiente descripción: " + evento.getDescripcionEvento());
             mensajeDTO.setEstadoLectura("NO_LEIDO");
 
-            // Hacemos la petición POST al microservicio de Mensajería
             mensajeriaWebClient.post()
-                .uri("") // <--- AQUÍ va la ruta final del controller de tu compañero (ej. "/enviar" o "")
+                .uri("/mensajerias")
                 .bodyValue(mensajeDTO)
                 .retrieve()
                 .bodyToMono(Void.class)
-                .block(); // Síncrono: espera a que se envíe
+                .block();
 
             System.out.println("ÉXITO: Mensaje enviado al microservicio de mensajería.");
 
         } catch (Exception e) {
-            // Si el servicio de tu compañero está apagado o falla, capturamos el error
-            // para que TU evento se guarde de todas formas y no le devuelva un error 500 a tu usuario.
             System.err.println("ERROR: No se pudo contactar al microservicio de mensajería. Motivo: " + e.getMessage());
         }
     }
