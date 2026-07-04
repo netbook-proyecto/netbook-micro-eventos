@@ -14,7 +14,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Copiar el archivo .jar generado en la Etapa 1 (Con el nombre de estudiantes)
-COPY --from=build /app/target/micro-estudiantes-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/micro_evento-0.0.1-SNAPSHOT.jar app.jar
 
 # Exponer el puerto oficial asignado a este microservicio
 EXPOSE 5010
