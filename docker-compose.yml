@@ -1,0 +1,21 @@
+services:
+  evento-services:
+    build: .
+    container_name: evento-services
+    restart: unless-stopped
+    ports:
+      - "5010:5010"
+    environment:
+      # URL apuntando a tu MySQL en Windows
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/evento?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: evento
+      SPRING_DATASOURCE_PASSWORD: system
+      # Si tu microservicio necesita comunicarse con otros, añade aquí las variables de entorno
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - red-microservicios
+
+networks:
+  red-microservicios:
+    external: true
