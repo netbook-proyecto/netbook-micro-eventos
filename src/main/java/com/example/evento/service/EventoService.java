@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.evento.models.DTO.EventoCalendarioDTO;
 import com.example.evento.models.DTO.MensajeriaDTO;
 import com.example.evento.models.entities.EventoCalendario;
 import com.example.evento.models.request.ActualizarEventoRequest;
@@ -26,20 +28,24 @@ public class EventoService {
     @Qualifier("mensajeriaWebClient")
     private WebClient mensajeriaWebClient;
 
-    public List<EventoCalendario> obtenerTodosLosEventos() {
-        return eventoRepository.findAll();
+    @Value("${app.notificaciones.correo-sistema}")
+    private String correoSistema;
+
+    public List<EventoCalendarioDTO> obtenerTodosLosEventos() {
+        return eventoRepository.findAll()
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
     }
 
-    public EventoCalendario obtenerEventoPorIdCalendario(int idEventoCalendario) {
-        EventoCalendario eventocalendario = eventoRepository.findById(idEventoCalendario).orElse(null);
-        if (eventocalendario == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado: " + idEventoCalendario);
-        }
-        return eventocalendario;
+    public EventoCalendarioDTO obtenerEventoPorIdCalendario(int idEventoCalendario) {
+        EventoCalendario evento = buscarEventoOLanzarError(idEventoCalendario);
+        return convertirADTO(evento);
     }
 
-    public EventoCalendario agregarEvento(AgregarEventoRequest nuevo) {
+    public EventoCalendarioDTO agregarEvento(AgregarEventoRequest nuevo) {
         EventoCalendario eventoNuevo = new EventoCalendario();
+        eventoNuevo.setIdCreador(nuevo.getIdCreador());
         eventoNuevo.setTituloEvento(nuevo.getTituloEvento());
         eventoNuevo.setDescripcionEvento(nuevo.getDescripcionEvento());
         eventoNuevo.setTipoEvento(nuevo.getTipoEvento());
@@ -50,7 +56,7 @@ public class EventoService {
 
         enviarMensajeNotificacion(eventoGuardado);
 
-        return eventoGuardado;
+        return convertirADTO(eventoGuardado);
     }
 
     public String eliminarEventoPorId(int idEventoCalendario) {
@@ -61,33 +67,54 @@ public class EventoService {
         return "Evento eliminado correctamente.";
     }
 
-    public EventoCalendario actualizarEvento(ActualizarEventoRequest nuevoEvento) {
-        EventoCalendario eventocalendario = eventoRepository.findById(nuevoEvento.getIdEventoCalendario()).orElse(null);
-        if (eventocalendario == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado: " + nuevoEvento.getIdEventoCalendario());
-        }
-        eventocalendario.setTituloEvento(nuevoEvento.getTituloEvento());
-        eventocalendario.setDescripcionEvento(nuevoEvento.getDescripcionEvento());
-        eventocalendario.setTipoEvento(nuevoEvento.getTipoEvento());
-        eventocalendario.setVisibilidad(nuevoEvento.getVisibilidad());
-        eventocalendario.setFechaEvento(nuevoEvento.getFechaEvento());
-        return eventoRepository.save(eventocalendario);
+    public EventoCalendarioDTO actualizarEvento(ActualizarEventoRequest nuevoEvento) {
+        EventoCalendario evento = buscarEventoOLanzarError(nuevoEvento.getIdEventoCalendario());
+
+        evento.setIdCreador(nuevoEvento.getIdCreador());
+        evento.setTituloEvento(nuevoEvento.getTituloEvento());
+        evento.setDescripcionEvento(nuevoEvento.getDescripcionEvento());
+        evento.setTipoEvento(nuevoEvento.getTipoEvento());
+        evento.setVisibilidad(nuevoEvento.getVisibilidad());
+        evento.setFechaEvento(nuevoEvento.getFechaEvento());
+
+        EventoCalendario eventoActualizado = eventoRepository.save(evento);
+        return convertirADTO(eventoActualizado);
+    }
+
+    private EventoCalendario buscarEventoOLanzarError(int idEventoCalendario) {
+        return eventoRepository.findById(idEventoCalendario)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Evento no encontrado: " + idEventoCalendario));
+    }
+
+    private EventoCalendarioDTO convertirADTO(EventoCalendario evento) {
+        EventoCalendarioDTO dto = new EventoCalendarioDTO();
+        dto.setIdEventoCalendario(evento.getIdEventoCalendario());
+        dto.setIdCreador(evento.getIdCreador());
+        dto.setTituloEvento(evento.getTituloEvento());
+        dto.setDescripcionEvento(evento.getDescripcionEvento());
+        dto.setTipoEvento(evento.getTipoEvento());
+        dto.setVisibilidad(evento.getVisibilidad());
+        dto.setFechaEvento(evento.getFechaEvento());
+        return dto;
     }
 
     private void enviarMensajeNotificacion(EventoCalendario evento) {
         try {
             MensajeriaDTO mensajeDTO = new MensajeriaDTO();
+            mensajeDTO.setCorreoEmisor(correoSistema);
+            mensajeDTO.setCorreoReceptor(correoSistema);
             mensajeDTO.setFechaEnvio(LocalDate.now().toString());
             mensajeDTO.setAsunto("Nuevo evento creado: " + evento.getTituloEvento());
             mensajeDTO.setCuerpoMensaje("Se ha creado el evento con la siguiente descripción: " + evento.getDescripcionEvento());
             mensajeDTO.setEstadoLectura("NO_LEIDO");
 
             mensajeriaWebClient.post()
-                .uri("/mensajerias")
-                .bodyValue(mensajeDTO)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+                    .uri("/mensajerias")
+                    .bodyValue(mensajeDTO)
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .block();
 
             System.out.println("ÉXITO: Mensaje enviado al microservicio de mensajería.");
 

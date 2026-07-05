@@ -14,7 +14,12 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173", "http://localhost:5174")
+                        .allowedOriginPatterns(
+                            "http://localhost:5173",
+                            "http://localhost:5174",
+                            "http://3.89.29.3:*",
+                            "https://*.amplifyapp.com"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*");
             }

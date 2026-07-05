@@ -1,6 +1,5 @@
 package com.example.evento.models.entities;
 
-
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -17,24 +16,25 @@ import lombok.Data;
 public class EventoCalendario {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idEventoCalendario;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
+    private int idCreador;
+
+    @Column(nullable = false)
     private String tituloEvento;
-    
+
     @Column(nullable = false, length = 500)
     private String descripcionEvento;
-    
+
     @Column(nullable = false, length = 50)
     private String tipoEvento;
-    
+
     @Column(nullable = false, length = 50)
     private String visibilidad;
-    
+
     @Column(nullable = false)
     private LocalDate fechaEvento;
 
-    }
-
-
+}
