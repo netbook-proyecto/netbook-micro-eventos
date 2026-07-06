@@ -17,7 +17,7 @@ public class CorsConfig {
                         .allowedOriginPatterns(
                             "http://localhost:5173",
                             "http://localhost:5174",
-                            "http://3.89.29.3:*",
+                            "http://18.234.61.211:*", // <-- ¡Aquí está tu IP nueva actualizada!
                             "https://*.amplifyapp.com"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
